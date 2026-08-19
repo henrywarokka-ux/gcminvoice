@@ -35,7 +35,54 @@
     align-items:start;
   }
   @media (max-width: 980px){
-    .app{grid-template-columns: 1fr; }
+    .app{grid-template-columns: 1fr; padding:14px; gap:16px;}
+    .panel{
+      position:static !important;
+      top:auto !important;
+    }
+  }
+
+  /* ---------- MOBILE INPUT USABILITY ---------- */
+  @media (max-width: 640px){
+    .panel{
+      padding:16px;
+    }
+    fieldset{padding:12px;}
+    label{font-size:13.5px; margin:10px 0 5px;}
+    input[type=text], input[type=number], input[type=date]{
+      font-size:16px;           /* prevents auto-zoom on iOS */
+      padding:12px 12px;
+      min-height:46px;
+    }
+    .item-grid3{
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .item-grid3 > div:nth-child(3){
+      grid-column: 1 / -1;      /* Harga gets its own full-width row */
+    }
+    .item-card{padding:12px;}
+    .btn-remove{
+      width:30px; height:30px;
+      font-size:16px;
+      top:10px; right:10px;
+    }
+    .btn{
+      padding:12px 14px;
+      font-size:14.5px;
+      min-height:46px;
+    }
+    .btn-primary{
+      font-size:16px;
+      min-height:50px;
+    }
+    .refresh-icon{
+      font-size:18px;
+      padding:4px 8px;
+      min-height:32px;
+    }
+    .inv-preview-box{font-size:13.5px;}
+    .total-summary{font-size:13.5px;}
   }
 
   /* ---------- FORM PANEL ---------- */
@@ -379,14 +426,14 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
-    padding:12px 0;
+    gap:14px;
+    padding:18px 0;
     background:#fff;
     border-bottom:1px solid #e5e7eb;
   }
   .brand-credit img{
-    width:26px;
-    height:26px;
+    width:72px;
+    height:72px;
     object-fit:contain;
   }
   .brand-credit span{

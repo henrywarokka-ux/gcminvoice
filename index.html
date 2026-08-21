@@ -151,7 +151,7 @@
     position:relative;
   }
   .item-card .item-title{
-    font-size:11.5px;
+    font-size:12px;
     font-weight:700;
     color:var(--navy);
     margin-bottom:4px;
@@ -224,7 +224,7 @@
     background:none;border:none;cursor:pointer;font-size:14px;color:var(--navy);
   }
   .hint{
-    font-size:11.5px;
+    font-size:12px;
     color:var(--muted);
     margin-top:4px;
   }
@@ -286,19 +286,20 @@
     font-size:19px;
     font-weight:800;
     letter-spacing:.03em;
-    margin-bottom:9mm;
+    margin-bottom:3mm;
   }
   .noinv-row{
-    font-size:11.5px;
+    font-size:12px;
     font-weight:700;
   }
   .noinv-row .val{
     font-weight:700;
-    margin-left:4mm;
+    display:block;
+    margin-top:1mm;
   }
   .top-right{
     flex:1;
-    font-size:11.5px;
+    font-size:12px;
   }
   .info-line{
     display:flex;
@@ -323,7 +324,7 @@
     width:100%;
     border-collapse:collapse;
     margin-top:2mm;
-    font-size:11.5px;
+    font-size:12px;
     table-layout:fixed;
   }
   table.items thead th{
@@ -331,14 +332,14 @@
     padding:2.2mm 2mm;
     font-weight:800;
     text-align:center;
-    background:#fff;
+    background:#f4f5f7;
   }
   table.items col.c-no{width:7%;}
   table.items col.c-nama{width:39%;}
-  table.items col.c-jml{width:11%;}
+  table.items col.c-jml{width:8%;}
   table.items col.c-unit{width:9%;}
   table.items col.c-harga{width:17%;}
-  table.items col.c-total{width:17%;}
+  table.items col.c-total{width:20%;}
 
   table.items tbody td{
     border-left:1.4px solid #000;
@@ -365,8 +366,9 @@
     width:100%;
     box-sizing:border-box;
   }
-  table.items td.money .rp{font-weight:700;}
-  table.items td.money .nom{font-weight:700;}
+  table.items td.money .rp{font-weight:400;}
+  table.items td.money .nom{font-weight:400;}
+  table.items td.money .total-nom{font-weight:700;}
   table.items tbody tr.empty td{height:6.2mm;}
 
   .below-table{
@@ -415,7 +417,7 @@
     justify-content:space-between;
     margin-top:12mm;
     gap:10mm;
-    font-size:11.5px;
+    font-size:12px;
   }
   .pay-info b{display:block; margin-bottom:1.5mm;}
   .pay-info .line{display:flex; margin-top:1mm;}
@@ -427,7 +429,7 @@
     font-style:italic;
     font-weight:700;
     color:#333;
-    font-size:11.5px;
+    font-size:12px;
     align-self:center;
     padding-top:2mm;
   }
@@ -439,7 +441,7 @@
 
   footer.credit{
     text-align:center;
-    font-size:11.5px;
+    font-size:12px;
     color:var(--muted);
     padding:18px 0 30px;
   }
@@ -550,7 +552,7 @@
         <div class="top-info">
           <div class="top-left">
             <div class="invoice-box">INVOICE</div>
-            <div class="noinv-row">No. Invoice :<span class="val" id="p-noinv">-----</span></div>
+            <div class="noinv-row">No. Invoice :<div class="val" id="p-noinv">-----</div></div>
           </div>
           <div class="top-right">
             <div class="info-line">
@@ -578,7 +580,7 @@
           </colgroup>
           <thead>
             <tr>
-              <th>NO</th><th>NAMA BARANG</th><th>JUMLAH</th><th>UNIT</th><th>HARGA</th><th>TOTAL</th>
+              <th>NO</th><th>NAMA BARANG</th><th>QTY</th><th>UNIT</th><th>HARGA</th><th>TOTAL</th>
             </tr>
           </thead>
           <tbody id="items-table-body"></tbody>
@@ -850,12 +852,12 @@ function renderPreview(){
     const tr = document.createElement('tr');
     if(idx % 2 === 1) tr.className = 'odd';
     tr.innerHTML = `
-      <td class="num">${idx+1}</td>
+      <td class="num">${it.nama || it.jumlah || it.harga ? idx+1 : ""}</td>
       <td>${escapeHtml(it.nama) || ''}</td>
       <td class="num">${it.jumlah ? Number(it.jumlah).toLocaleString('id-ID') : ''}</td>
       <td class="num">${escapeHtml(it.satuan)}</td>
       <td class="money">${it.harga ? (()=>{const p=formatRupiahParts(it.harga); return `<div class="money-wrap"><span class="rp">${p.rp}</span><span class="nom">${p.val}</span></div>`;})() : ''}</td>
-      <td class="money">${total ? (()=>{const p=formatRupiahParts(total); return `<div class="money-wrap"><span class="rp">${p.rp}</span><span class="nom">${p.val}</span></div>`;})() : ''}</td>
+      <td class="money">${total ? (()=>{const p=formatRupiahParts(total); return `<div class="money-wrap"><span class="rp">${p.rp}</span><span class="nom total-nom">${p.val}</span></div>`;})() : ''}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -984,7 +986,7 @@ document.getElementById('btn-download').addEventListener('click', async ()=>{
   const dd = String(today.getDate()).padStart(2,'0');
   document.getElementById('f-tanggal').value = `${yyyy}-${mm}-${dd}`;
 
-  addItem({ nama:'', satuan:'', jumlah:1, harga:0 });
+  addItem({ nama:'', satuan:'', jumlah:'', harga:0 });
   regenerateInvoiceNumber();
   renderPreview();
 })();

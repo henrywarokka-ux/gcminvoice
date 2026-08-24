@@ -45,6 +45,7 @@
       position:static !important;
       top:auto !important;
     }
+    .item-grid3{grid-template-columns:1fr !important; gap:8px;}
   }
 
   /* ---------- MOBILE INPUT USABILITY ---------- */
@@ -60,11 +61,8 @@
       min-height:46px;
     }
     .item-grid3{
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    .item-grid3 > div:nth-child(3){
-      grid-column: 1 / -1;      /* Harga gets its own full-width row */
+      grid-template-columns: 1fr;
+      gap:8px;
     }
     .item-card{padding:12px;}
     .btn-remove{
@@ -264,6 +262,7 @@
     font-family:'Inter','Segoe UI',Arial,Helvetica,sans-serif;
     color:#111;
     line-height:1.45;
+    box-sizing:border-box;
   }
   .hdr-img{
     width:100%;
@@ -333,12 +332,13 @@
     font-weight:800;
     text-align:center;
     background:#f4f5f7;
+    white-space:nowrap;
   }
-  table.items col.c-no{width:7%;}
-  table.items col.c-nama{width:39%;}
+  table.items col.c-no{width:5%;}
+  table.items col.c-nama{width:42%;}
   table.items col.c-jml{width:8%;}
-  table.items col.c-unit{width:9%;}
-  table.items col.c-harga{width:17%;}
+  table.items col.c-unit{width:8%;}
+  table.items col.c-harga{width:16%;}
   table.items col.c-total{width:20%;}
 
   table.items tbody td{
@@ -352,7 +352,7 @@
   table.items tbody tr.odd{background:var(--stripe);}
   table.items tbody tr:first-child td{border-top:1.4px solid #000;}
   table.items tbody tr:last-child td{border-bottom:1.4px solid #000;}
-  table.items td.num{text-align:center;}
+  table.items td.num{text-align:center; white-space:nowrap;}
   table.items td.money{
     white-space:nowrap;
     padding:0;
@@ -469,13 +469,237 @@
   }
 
   @media print{
-    body{background:#fff;}
+    html, body{
+      background:#fff;
+      width:210mm !important;
+      min-width:210mm !important;
+      max-width:none !important;
+      margin:0 !important;
+      padding:0 !important;
+      overflow-x:visible !important;
+      overflow-y:visible !important;
+    }
     .panel, footer.credit, .brand-credit{display:none !important;}
     .app{display:block; padding:0; max-width:none;}
-    .preview-wrap{display:block;}
-    #page-scale-outer{max-width:none; overflow:visible;}
-    .page{box-shadow:none; margin:0; width:210mm; min-height:297mm;}
+    .preview-wrap{display:block; width:auto !important;}
+    #page-scale-outer{max-width:none; overflow:visible; width:auto !important;}
+    .page{
+      box-shadow:none;
+      margin:0 !important;
+      width:210mm !important;
+      min-height:297mm;
+      max-height:297mm;
+      box-sizing:border-box;
+      page-break-after:always;
+      transform:none !important;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
     @page{size:A4; margin:0;}
+  }
+
+  /* Voice Input Styles - Mobile Optimized */
+  .voice-btn {
+    background: linear-gradient(135deg, var(--navy) 0%, #2a3f7e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    transition: all 0.15s ease;
+    font-size: 18px;
+    vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(26,36,86,0.25);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .voice-btn:hover {
+    background: linear-gradient(135deg, #2a3f7e 0%, var(--navy) 100%);
+    transform: scale(1.05);
+  }
+  .voice-btn:active {
+    transform: scale(0.92);
+  }
+  .voice-btn.recording {
+    background: linear-gradient(135deg, #C00000 0%, #ff4444 100%);
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(192,0,0,0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(192,0,0,0); }
+  }
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .input-wrap input {
+    flex: 1;
+    min-width: 0;
+  }
+  .voice-status {
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 4px;
+    font-weight: 600;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .voice-status::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .voice-status.active::before {
+    background: var(--red);
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  /* Mobile Voice Overlay */
+  .voice-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .voice-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .voice-overlay-inner {
+    background: var(--panel);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    max-width: 300px;
+    width: 85%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+  .voice-overlay-mic {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C00000 0%, #ff4444 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 16px;
+    animation: pulse 1.2s infinite;
+    color: #fff;
+  }
+  .voice-overlay-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .voice-overlay-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .voice-overlay-stop {
+    margin-top: 20px;
+    padding: 12px 32px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .voice-overlay-stop:active {
+    opacity: 0.8;
+  }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 640px){
+    .voice-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      border-radius: 10px;
+      margin-left: 4px;
+    }
+    .voice-status {
+      font-size: 13px;
+    }
+    .input-wrap {
+      gap: 8px;
+    }
+    .input-wrap input{min-width:80px;}
+    /* Mobile table column adjustments */
+    table.items col.c-no{width:8%;}
+    table.items col.c-nama{width:32%;}
+    table.items col.c-jml{width:10%;}
+    table.items col.c-unit{width:10%;}
+    table.items col.c-harga{width:17%;}
+    table.items col.c-total{width:17%;}
+    table.items{font-size:11px;}
+    table.items thead th{padding:1.5mm 1mm;}
+    table.items tbody td{padding:1.5mm 1mm;}
+    table.items td.num input.f-item-jumlah,
+    table.items td input.f-item-jumlah{
+      font-size:14px !important;
+      padding:8px 4px !important;
+      min-height:40px !important;
+      text-align:center;
+    }
+  }
+  @media (max-width: 380px){
+    .voice-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+    }
+    /* Extra small screens */
+    table.items col.c-no{width:8%;}
+    table.items col.c-nama{width:34%;}
+    table.items col.c-jml{width:10%;}
+    table.items col.c-unit{width:10%;}
+    table.items col.c-harga{width:16%;}
+    table.items col.c-total{width:22%;}
+    table.items{font-size:10px;}
+  }
+
+
+  /* Remove number input spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 </style>
 <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' rel='stylesheet'>
@@ -497,13 +721,13 @@
     <fieldset>
       <legend>Data Pelanggan</legend>
       <label>Nama / Perusahaan</label>
-      <input type="text" id="f-nama" placeholder="cth. PT ASIA INTI LESTARI">
+      <div class="input-wrap"><input type="text" id="f-nama" placeholder="cth. PT ASIA INTI LESTARI"><button type="button" class="voice-btn" data-target="f-nama" title="Input suara">🎤</button></div>
 
       <label>Alamat</label>
-      <input type="text" id="f-alamat" placeholder="cth. Lombok">
+      <div class="input-wrap"><input type="text" id="f-alamat" placeholder="cth. Lombok"><button type="button" class="voice-btn" data-target="f-alamat" title="Input suara">🎤</button></div>
 
       <label>No. Telepon</label>
-      <input type="text" id="f-telp" placeholder="cth. 0812xxxxxxx (kosongkan jika tidak ada)">
+      <div class="input-wrap"><input type="text" id="f-telp" placeholder="cth. 0812xxxxxxx (kosongkan jika tidak ada)"><button type="button" class="voice-btn" data-target="f-telp" title="Input suara">🎤</button></div>
 
       <label>Tanggal Invoice</label>
       <input type="date" id="f-tanggal">
@@ -527,7 +751,7 @@
     <fieldset>
       <legend>Pembayaran</legend>
       <label>DP (Down Payment)</label>
-      <input type="text" id="f-dp" class="ribuan" placeholder="0" value="0">
+      <div class="input-wrap"><input type="text" id="f-dp" class="ribuan" placeholder="0" value="0"><button type="button" class="voice-btn" data-target="f-dp" title="Input suara">🎤</button></div>
 
       <div class="total-summary">
         <div><span>Total Harga Barang</span><span id="sum-subtotal">Rp 0</span></div>
@@ -789,19 +1013,19 @@ function renderItemForm(){
       <div class="item-title">Barang #${idx+1}</div>
       ${items.length>1 ? `<button class="btn-remove" type="button" title="Hapus">&times;</button>` : ''}
       <label style="margin-top:2px;">Nama Barang</label>
-      <input type="text" class="f-item-nama" placeholder="TULIS BARANG DISINI" value="${escapeAttr(it.nama)}">
+      <div class="input-wrap"><input type="text" class="f-item-nama" placeholder="TULIS BARANG DISINI" value="${escapeAttr(it.nama)}"><button type="button" class="voice-btn" data-target-class="f-item-nama" title="Input suara">🎤</button></div>
       <div class="item-grid3" style="margin-top:8px;">
         <div>
           <label style="margin-top:0;">Jumlah</label>
-          <input type="number" class="f-item-jumlah" min="0" value="${it.jumlah}">
+          <div class="input-wrap"><input type="number" class="f-item-jumlah" min="0" value="${it.jumlah}"><button type="button" class="voice-btn" data-target-class="f-item-jumlah" title="Input suara">🎤</button></div>
         </div>
         <div>
           <label style="margin-top:0;">Satuan</label>
-          <input type="text" class="f-item-satuan" placeholder="SET/PCS/UNIT" value="${escapeAttr(it.satuan)}">
+          <div class="input-wrap"><input type="text" class="f-item-satuan" placeholder="SET/PCS/UNIT" value="${escapeAttr(it.satuan)}"><button type="button" class="voice-btn" data-target-class="f-item-satuan" title="Input suara">🎤</button></div>
         </div>
         <div>
           <label style="margin-top:0;">Harga (Rp)</label>
-          <input type="text" class="f-item-harga ribuan" value="${formatRibuan(it.harga)}">
+          <div class="input-wrap"><input type="text" class="f-item-harga ribuan" value="${formatRibuan(it.harga)}"><button type="button" class="voice-btn" data-target-class="f-item-harga" title="Input suara">🎤</button></div>
         </div>
       </div>
     `;
@@ -991,5 +1215,481 @@ document.getElementById('btn-download').addEventListener('click', async ()=>{
   renderPreview();
 })();
 </script>
+
+<!-- Voice Input Script - Mobile Optimized -->
+<script>
+(function() {
+  'use strict';
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  if (!SpeechRecognition) {
+    console.warn('Browser tidak mendukung Speech Recognition');
+    document.querySelectorAll('.voice-btn').forEach(btn => btn.style.display = 'none');
+    return;
+  }
+
+  let currentRecognition = null;
+  let isRecording = false;
+  let currentTargetInput = null;
+  let overlayEl = null;
+
+  function createOverlay() {
+    if (overlayEl) return overlayEl;
+    overlayEl = document.createElement('div');
+    overlayEl.className = 'voice-overlay';
+    overlayEl.innerHTML = 
+      '<div class="voice-overlay-inner">' +
+        '<div class="voice-overlay-mic">🎙️</div>' +
+        '<div class="voice-overlay-text">Mendengarkan...</div>' +
+        '<div class="voice-overlay-hint">Ucapkan teks yang ingin dimasukkan</div>' +
+        '<button class="voice-overlay-stop" type="button">Selesai</button>' +
+      '</div>';
+    document.body.appendChild(overlayEl);
+    overlayEl.querySelector('.voice-overlay-stop').addEventListener('click', stopRecording);
+    overlayEl.addEventListener('click', function(e) {
+      if (e.target === overlayEl) stopRecording();
+    });
+    return overlayEl;
+  }
+
+  function haptic(ms) {
+    if (navigator.vibrate) navigator.vibrate(ms || 50);
+  }
+  function hapticStart() {
+    if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+  }
+
+  function createRecognition() {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'id-ID';
+    recognition.maxAlternatives = 1;
+    return recognition;
+  }
+
+  function stopRecording() {
+    if (currentRecognition) {
+      try { currentRecognition.stop(); } catch(e) {}
+      currentRecognition = null;
+    }
+    isRecording = false;
+    document.querySelectorAll('.voice-btn').forEach(btn => {
+      btn.classList.remove('recording');
+      btn.innerHTML = '🎤';
+    });
+    document.querySelectorAll('.voice-status').forEach(el => {
+      el.textContent = '';
+      el.classList.remove('active');
+    });
+    if (overlayEl) overlayEl.classList.remove('show');
+    if (currentTargetInput) {
+      currentTargetInput.style.borderColor = '';
+      if (isMobile) {
+        setTimeout(() => {
+          currentTargetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          currentTargetInput.focus();
+        }, 300);
+      }
+    }
+  }
+
+  function updateOverlay(text) {
+    if (!overlayEl) return;
+    const textEl = overlayEl.querySelector('.voice-overlay-text');
+    if (textEl) textEl.textContent = text || 'Mendengarkan...';
+  }
+
+  // Get target input from button
+  function getTargetInput(button) {
+    const targetId = button.getAttribute('data-target');
+    const targetClass = button.getAttribute('data-target-class');
+
+    if (targetId) {
+      return document.getElementById(targetId);
+    }
+    if (targetClass) {
+      // Find the input with this class in the same container as the button
+      const wrap = button.closest('.input-wrap, .item-card');
+      if (wrap) {
+        return wrap.querySelector('input.' + targetClass) || wrap.querySelector('input');
+      }
+    }
+    return null;
+  }
+
+  // Indonesian number words to digits parser
+  function parseIndonesianNumber(text) {
+    const words = text.toLowerCase().trim().replace(/[.,]/g, '').split(/\s+/);
+
+    const map = {
+      'nol': 0, 'kosong': 0, 'nul': 0,
+      'satu': 1, 'se': 1,
+      'dua': 2,
+      'tiga': 3,
+      'empat': 4,
+      'lima': 5,
+      'enam': 6,
+      'tujuh': 7,
+      'delapan': 8,
+      'sembilan': 9,
+      'sepuluh': 10,
+      'sebelas': 11,
+      'belas': 10,  // modifier
+      'puluh': 10,  // modifier
+      'ratus': 100, // modifier
+      'ribu': 1000,
+      'seribu': 1000,
+      'juta': 1000000,
+      'miliar': 1000000000,
+      'billion': 1000000000,
+      'milyar': 1000000000
+    };
+
+    let total = 0;
+    let current = 0;
+    let prevMultiplier = 1;
+
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const num = map[w];
+
+      if (num === undefined) {
+        // Try to extract digits directly
+        const digits = w.replace(/[^0-9]/g, '');
+        if (digits) {
+          current += parseInt(digits, 10);
+        }
+        continue;
+      }
+
+      if (w === 'belas') {
+        current += 10 + (current % 10 === 0 ? 0 : 0); // reset last digit
+        // Actually: "dua belas" = 2 + 10 = 12
+        // We need to handle this differently
+      } else if (w === 'puluh') {
+        current = Math.floor(current / 10) * 10 + (current % 10) * 10;
+        // Simpler: if we have "dua puluh", current should be 2, then *10 = 20
+      } else if (w === 'ratus') {
+        current = (current % 10) * 100;
+      } else if (w === 'ribu' || w === 'seribu') {
+        if (current === 0) current = 1;
+        current *= 1000;
+        total += current;
+        current = 0;
+      } else if (w === 'juta') {
+        if (current === 0) current = 1;
+        current *= 1000000;
+        total += current;
+        current = 0;
+      } else if (w === 'miliar' || w === 'milyar' || w === 'billion') {
+        if (current === 0) current = 1;
+        current *= 1000000000;
+        total += current;
+        current = 0;
+      } else {
+        current += num;
+      }
+    }
+
+    return total + current;
+  }
+
+  // Better Indonesian number parser
+  function indonesianToNumber(text) {
+    text = text.toLowerCase().trim().replace(/[.,]/g, '');
+
+    // Direct digits extraction first
+    const directDigits = text.replace(/[^0-9]/g, '');
+    if (directDigits && text.length === directDigits.length) {
+      return parseInt(directDigits, 10);
+    }
+
+    // Parse word by word
+    const units = {
+      'nol': 0, 'kosong': 0,
+      'satu': 1, 'se': 1,
+      'dua': 2, 'tiga': 3, 'empat': 4, 'lima': 5,
+      'enam': 6, 'tujuh': 7, 'delapan': 8, 'sembilan': 9
+    };
+    const teens = {
+      'sepuluh': 10, 'sebelas': 11,
+      'dua belas': 12, 'tiga belas': 13, 'empat belas': 14, 'lima belas': 15,
+      'enam belas': 16, 'tujuh belas': 17, 'delapan belas': 18, 'sembilan belas': 19
+    };
+
+    let result = 0;
+    let temp = 0;
+    const words = text.split(/\s+/);
+
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+
+      // Check for "X belas" pattern
+      if (i + 1 < words.length && words[i + 1] === 'belas') {
+        const unit = units[w];
+        if (unit !== undefined && unit > 0) {
+          temp += 10 + unit;
+          i++; // skip 'belas'
+          continue;
+        }
+      }
+
+      // Check for "X puluh" pattern
+      if (i + 1 < words.length && words[i + 1] === 'puluh') {
+        const unit = units[w];
+        if (unit !== undefined && unit > 0) {
+          temp += unit * 10;
+          i++; // skip 'puluh'
+          continue;
+        }
+      }
+
+      // Check for "X ratus" pattern
+      if (i + 1 < words.length && words[i + 1] === 'ratus') {
+        const unit = units[w];
+        if (unit !== undefined && unit > 0) {
+          temp += unit * 100;
+          i++; // skip 'ratus'
+          continue;
+        }
+      }
+
+      // Check for single words
+      if (units[w] !== undefined) {
+        temp += units[w];
+      } else if (w === 'sepuluh') {
+        temp += 10;
+      } else if (w === 'sebelas') {
+        temp += 11;
+      } else if (w === 'seratus') {
+        temp += 100;
+      } else if (w === 'seribu') {
+        if (temp === 0) temp = 1;
+        result += temp * 1000;
+        temp = 0;
+      } else if (w === 'ribu') {
+        if (temp === 0) temp = 1;
+        result += temp * 1000;
+        temp = 0;
+      } else if (w === 'juta') {
+        if (temp === 0) temp = 1;
+        result += temp * 1000000;
+        temp = 0;
+      } else if (w === 'miliar' || w === 'milyar') {
+        if (temp === 0) temp = 1;
+        result += temp * 1000000000;
+        temp = 0;
+      } else {
+        // Try extracting any digits
+        const digits = w.replace(/[^0-9]/g, '');
+        if (digits) {
+          temp += parseInt(digits, 10);
+        }
+      }
+    }
+
+    return result + temp;
+  }
+
+  // Set input value (handles both text and number inputs)
+  function setInputValue(input, value) {
+    if (input.type === 'number' || input.classList.contains('f-item-jumlah') || input.classList.contains('ribuan')) {
+      // For number inputs, parse Indonesian spoken numbers
+      const num = indonesianToNumber(value);
+      input.value = num || '';
+    } else if (input.id === 'f-telp' || input.classList.contains('f-telp')) {
+      // For phone number, remove all spaces
+      input.value = value.replace(/\s/g, '').toUpperCase();
+    } else {
+      // For text inputs, convert to UPPERCASE
+      input.value = value.toUpperCase();
+    }
+  }
+
+  function startRecording(button) {
+    stopRecording();
+
+    const targetInput = getTargetInput(button);
+    if (!targetInput) {
+      console.error('Target input not found for button', button);
+      return;
+    }
+    currentTargetInput = targetInput;
+
+    // Find or create status element
+    let statusEl = null;
+    const card = targetInput.closest('.item-card');
+    const fieldset = targetInput.closest('fieldset');
+    if (card) {
+      statusEl = card.querySelector('.voice-status');
+    } else if (fieldset) {
+      statusEl = fieldset.querySelector('.voice-status');
+    }
+    if (!statusEl) {
+      statusEl = document.createElement('div');
+      statusEl.className = 'voice-status';
+      const wrap = targetInput.closest('.input-wrap');
+      if (wrap) {
+        wrap.insertAdjacentElement('afterend', statusEl);
+      } else {
+        targetInput.parentElement.insertAdjacentElement('afterend', statusEl);
+      }
+    }
+
+    const recognition = createRecognition();
+    currentRecognition = recognition;
+
+    // Clear previous value before recording
+    targetInput.value = '';
+    let finalTranscript = '';
+
+    recognition.onstart = function() {
+      isRecording = true;
+      hapticStart();
+      button.classList.add('recording');
+      button.innerHTML = '⏹️';
+      statusEl.textContent = 'Mendengarkan...';
+      statusEl.classList.add('active');
+      targetInput.style.borderColor = '#C00000';
+      if (isMobile) {
+        createOverlay().classList.add('show');
+        updateOverlay('Mendengarkan...');
+      }
+    };
+
+    recognition.onresult = function(event) {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      const combined = (finalTranscript + interimTranscript).trim();
+      if (combined) {
+        setInputValue(targetInput, combined);
+      }
+      const displayText = interimTranscript || finalTranscript || 'Mendengarkan...';
+      statusEl.textContent = interimTranscript ? 'Mendengarkan: ' + interimTranscript : (finalTranscript ? 'Mendengarkan: ' + finalTranscript : 'Mendengarkan...');
+      if (isMobile && displayText !== 'Mendengarkan...') updateOverlay(displayText);
+      targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    recognition.onerror = function(event) {
+      console.error('Speech error:', event.error);
+      let msg = 'Error';
+      switch(event.error) {
+        case 'no-speech': msg = 'Tidak ada suara'; break;
+        case 'audio-capture': msg = 'Mikrofon tidak tersedia'; break;
+        case 'not-allowed': msg = 'Akses mikrofon ditolak'; break;
+        case 'network': msg = 'Error jaringan'; break;
+        case 'aborted': msg = 'Dibatalkan'; break;
+        default: msg = 'Error: ' + event.error;
+      }
+      statusEl.textContent = msg;
+      statusEl.classList.remove('active');
+      if (isMobile) updateOverlay(msg);
+      haptic([100, 50, 100]);
+      setTimeout(stopRecording, 1500);
+    };
+
+    recognition.onend = function() {
+      targetInput.style.borderColor = '';
+      if (isRecording) {
+        statusEl.textContent = 'Selesai';
+        statusEl.classList.remove('active');
+        haptic(30);
+        setTimeout(() => { if(statusEl.textContent === 'Selesai') statusEl.textContent = ''; }, 2000);
+      }
+      stopRecording();
+    };
+
+    try {
+      recognition.start();
+    } catch(e) {
+      console.error('Failed to start:', e);
+      statusEl.textContent = 'Gagal memulai';
+      haptic([100, 50, 100]);
+    }
+  }
+
+  function handleVoiceBtn(e) {
+    const btn = e.target.closest('.voice-btn');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (isRecording && btn.classList.contains('recording')) {
+      stopRecording();
+    } else {
+      startRecording(btn);
+    }
+  }
+
+  document.addEventListener('click', handleVoiceBtn);
+  document.addEventListener('touchend', function(e) {
+    const btn = e.target.closest('.voice-btn');
+    if (btn) handleVoiceBtn(e);
+  }, { passive: false });
+
+  // Handle dynamically added items
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1) {
+          const inputs = node.querySelectorAll ? node.querySelectorAll('input[type="text"], input[type="number"]') : [];
+          inputs.forEach(function(input) {
+            if (!input.closest('.input-wrap') && (input.id || input.className)) {
+              const parent = input.parentElement;
+              if (parent && !parent.classList.contains('input-wrap')) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'voice-btn';
+                if (input.id) {
+                  btn.setAttribute('data-target', input.id);
+                } else if (input.className) {
+                  const firstClass = input.className.split(' ')[0];
+                  btn.setAttribute('data-target-class', firstClass);
+                }
+                btn.title = 'Input suara';
+                btn.innerHTML = '🎤';
+
+                const wrap = document.createElement('div');
+                wrap.className = 'input-wrap';
+                parent.insertBefore(wrap, input);
+                wrap.appendChild(input);
+                wrap.appendChild(btn);
+              }
+            }
+          });
+        }
+      });
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Keyboard shortcut
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+      const active = document.activeElement;
+      if (active && active.tagName === 'INPUT') {
+        const wrap = active.closest('.input-wrap');
+        if (wrap) {
+          const btn = wrap.querySelector('.voice-btn');
+          if (btn) btn.click();
+        }
+      }
+    }
+  });
+
+  console.log('Voice ready | Mobile: ' + isMobile + ' | Buttons: ' + document.querySelectorAll('.voice-btn').length);
+})();
+</script>
+
 </body>
 </html>

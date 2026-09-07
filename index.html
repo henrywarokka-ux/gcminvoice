@@ -429,14 +429,13 @@
     gap:8mm;
     font-size:12px;
   }
-  .pay-info{width:56%; flex:none; font-size:10.5px; line-height:1.5;}
+  .pay-info{width:44%; flex:none; font-size:10.5px; line-height:1.5;}
   .pay-info b{display:block; margin-bottom:1.5mm; font-size:11px;}
   .pay-info .line{display:flex; margin-top:1mm;}
   .pay-info .line .lbl{width:26mm; font-weight:700; flex-shrink:0;}
   .pay-info .line .val{font-weight:700;}
   .thankyou{
-    width:36%;
-    flex:none;
+    flex:1;
     text-align:center;
     font-style:italic;
     font-weight:700;
@@ -875,7 +874,7 @@ document.getElementById('arrow-img').src = "data:image/png;base64," + ARROW_IMG_
 
 /* ================== GOOGLE SHEET DATABASE (opsional) ================== */
 /* Ganti URL di bawah dengan URL Web App Apps Script (lihat file panduan terpisah). */
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycby8hSBwuv4DubRLczLU_OZe7Q1DYZusNbk-LmGmrcleA0H6wt0Et-QWw8pNDpDFjgOd/exec';
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxAMXaWpGxmrMx6-LlL7Ka002Hi1XyTGfTDYubYb5BIEvNgU5uNb86Yv0XywPmZuFTw/exec';
 
 function sheetConfigured(){
   return SHEET_API_URL && SHEET_API_URL.indexOf('GANTI_DENGAN_URL') !== 0;
@@ -942,7 +941,12 @@ async function loadInvoiceFromSheet(){
     const parts = String(rec.noInvoice).split('-');
     randomPart = parts[0] || randomDigits(5);
 
-    document.getElementById('f-tanggal').value = rec.tanggal || '';
+    // Tanggal dari Sheet kadang berupa string ISO (2026-09-07T00:00:00.000Z) -> ambil bagian tanggalnya saja
+    let tanggalVal = rec.tanggal || '';
+    if(tanggalVal && tanggalVal.indexOf('T') !== -1){
+      tanggalVal = tanggalVal.split('T')[0];
+    }
+    document.getElementById('f-tanggal').value = tanggalVal;
     document.getElementById('f-nama').value = rec.nama || '';
     document.getElementById('f-alamat').value = rec.alamat || '';
     document.getElementById('f-telp').value = rec.telp || '';

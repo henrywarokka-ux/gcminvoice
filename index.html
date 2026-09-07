@@ -271,6 +271,7 @@
     color:#111;
     line-height:1.45;
     box-sizing:border-box;
+    text-transform:uppercase;
   }
   .hdr-img{
     width:100%;
@@ -423,23 +424,24 @@
   .footer-row{
     display:flex;
     justify-content:space-between;
+    align-items:flex-start;
     margin-top:12mm;
-    gap:10mm;
+    gap:8mm;
     font-size:12px;
   }
-  .pay-info b{display:block; margin-bottom:1.5mm;}
+  .pay-info{width:56%; flex:none; font-size:10.5px; line-height:1.5;}
+  .pay-info b{display:block; margin-bottom:1.5mm; font-size:11px;}
   .pay-info .line{display:flex; margin-top:1mm;}
   .pay-info .line .lbl{width:26mm; font-weight:700; flex-shrink:0;}
   .pay-info .line .val{font-weight:700;}
   .thankyou{
-    flex:1;
+    width:36%;
+    flex:none;
     text-align:center;
     font-style:italic;
     font-weight:700;
     color:#333;
     font-size:12px;
-    align-self:center;
-    padding-top:2mm;
   }
   .arrow-img{
     width:100%;
@@ -880,6 +882,7 @@ function sheetConfigured(){
 }
 
 async function saveInvoiceToSheet(lastType){
+  const statusEl = document.getElementById('load-status');
   if(!sheetConfigured()) return;
   try{
     const payload = {
@@ -898,8 +901,16 @@ async function saveInvoiceToSheet(lastType){
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
+    if(statusEl){
+      statusEl.textContent = 'Tersimpan ke database (No. ' + payload.noInvoice + ').';
+      statusEl.style.color = 'var(--blue)';
+    }
   }catch(err){
     console.error('Gagal simpan ke Google Sheet:', err);
+    if(statusEl){
+      statusEl.textContent = 'Gagal simpan ke database: ' + err.message;
+      statusEl.style.color = 'var(--red)';
+    }
   }
 }
 
@@ -1290,6 +1301,7 @@ document.getElementById('btn-download').addEventListener('click', async ()=>{
     let fname = `INV - ${nama}${alamat ? ' ' + alamat : ''} - ${noInv}.pdf`;
     fname = sanitizeFilename(fname);
     pdf.save(fname);
+    saveInvoiceToSheet('invoice');
   }catch(err){
     alert('Gagal membuat PDF: ' + err.message);
     console.error(err);
@@ -1338,8 +1350,8 @@ function buildQuotePage(){
   if(payInfo){
     payInfo.innerHTML = `
       <b>Syarat &amp; Ketentuan</b>
-      <div class="line"><span class="val">Penawaran ini berlaku 14 hari sejak tanggal di atas.</span></div>
-      <div class="line"><span class="val">Harga dapat berubah tanpa pemberitahuan sebelumnya.</span></div>
+      <div class="line"><span class="val">Penawaran berlaku 14 hari sejak tanggal di atas.</span></div>
+      <div class="line"><span class="val">Harga dapat berubah tanpa pemberitahuan.</span></div>
     `;
   }
 
@@ -1388,6 +1400,7 @@ document.getElementById('btn-download-quote').addEventListener('click', async ()
     let fname = `PENAWARAN - ${nama}${alamat ? ' ' + alamat : ''} - ${noPenawaran}.pdf`;
     fname = sanitizeFilename(fname);
     pdf.save(fname);
+    saveInvoiceToSheet('penawaran');
   }catch(err){
     alert('Gagal membuat PDF Penawaran: ' + err.message);
     console.error(err);

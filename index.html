@@ -968,6 +968,8 @@ async function loadInvoiceFromSheet(){
   }
 }
 
+document.getElementById('btn-load-sheet').addEventListener('click', loadInvoiceFromSheet);
+
 /* ================== STATE ================== */
 let items = [];
 let itemUid = 0;
